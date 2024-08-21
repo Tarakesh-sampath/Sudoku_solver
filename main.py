@@ -4,9 +4,10 @@ from Sudoku_solver.Constraint_hybride import Algm_1
 from Sudoku_solver.My_Algm import my_algm
 from Sudoku_solver.Sudoku_base import SudokuBase
 import copy
-
+import os
 def main_menu():
     while True:
+        os.system('cls' if os.name == 'nt' else 'clear')
         choice = int(input("""
         Enter the algorithm to run:
         1 - Classic Backtracking
