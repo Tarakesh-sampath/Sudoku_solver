@@ -20,7 +20,6 @@ class backtracker(SudokuBase):
             if self.is_valid(i, (row, col)):
                 self.board[row][col] = i
                 self.print_board()
-                print("\n")
 
                 if self.solve():
                     return True
