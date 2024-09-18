@@ -1,6 +1,6 @@
 # main.py
 from Sudoku_solver.Backtracker import backtracker
-from Sudoku_solver.Constraint_hybride import Algm_1
+from Sudoku_solver.Constraint_hybride import ConstraintHybride
 from Sudoku_solver.My_Algm import my_algm
 from Sudoku_solver.Sudoku_base import SudokuBase
 import copy
@@ -21,7 +21,7 @@ def main_menu():
             solver = backtracker(copy.deepcopy(SudokuBase.board))
         elif choice == 2:
             #A hybride of Constraint Propagation(find the feasable possibility and reduce the backtracking branch) and Backtracking
-            solver = Algm_1(copy.deepcopy(SudokuBase.board))
+            solver = ConstraintHybride(copy.deepcopy(SudokuBase.board))
         elif choice == 3:
             solver = my_algm(copy.deepcopy(SudokuBase.board))
         elif choice == 4:

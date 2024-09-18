@@ -3,7 +3,7 @@ import tracemalloc
 import copy
 import os
 from Sudoku_solver.Backtracker import backtracker
-from Sudoku_solver.Constraint_hybride import Algm_1
+from Sudoku_solver.Constraint_hybride import ConstraintHybride
 from Sudoku_solver.My_Algm import my_algm
 from Sudoku_solver.Sudoku_base import SudokuBase
 
@@ -51,7 +51,7 @@ def display_metrics(metrics):
         print("+--------------------------------+-----------------------+-------------------+-----------------------+-----------+")
 
 def main():
-    algorithms = [backtracker, Algm_1, my_algm]
+    algorithms = [backtracker, ConstraintHybride, my_algm]
     metrics = []
 
     for algorithm in algorithms:

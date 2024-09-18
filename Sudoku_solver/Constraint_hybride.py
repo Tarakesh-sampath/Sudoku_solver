@@ -1,7 +1,7 @@
 # ConstraintHybride.py
 from Sudoku_solver.Sudoku_base import SudokuBase
 
-class Algm_1(SudokuBase):
+class ConstraintHybride(SudokuBase):
     #A hybride of Constraint Propagation(find the feasable possibility and reduce the backtracking branch) and Backtracking
     """This algorithm can be described as a constraint satisfaction-based backtracking hybrid. The use of constraint propagation 
     helps limit the number of possibilities the backtracking algorithm has to explore, making the overall approach more efficient 
