@@ -4,6 +4,7 @@ from Sudoku_solver.Sudoku_base import SudokuBase
 class backtracker(SudokuBase):
     def __init__(self, board=None):
         self.board = board if board is not None else self.get_board()
+        self.iterations = 0  # Initialize iterations counter
     def find_empty(self):
         for i in range(len(self.board)):
             for j in range(len(self.board[0])):
@@ -11,6 +12,7 @@ class backtracker(SudokuBase):
                     return (i, j)  # row, col
         return None
     def solve(self):
+        self.iterations += 1
         find = self.find_empty()
         if not find:
             return True

@@ -9,6 +9,7 @@ class Algm_1(SudokuBase):
 
     def __init__(self, board=None):
         self.board = board if board is not None else None
+        self.iterations = 0 
     def find_valid_spots(self):
         invalid_spots = set()
         for num in range(1, 10):
@@ -35,6 +36,7 @@ class Algm_1(SudokuBase):
                 used_numbers.add(self.board[((i // 3)*3) + x][((j//3)*3)+ y])
         return {num for num in range(1, 10) if num not in used_numbers}
     def solve(self):
+        self.iterations += 1
         # Find the first empty spot
         min_possible_values = 10
         min_spot = None

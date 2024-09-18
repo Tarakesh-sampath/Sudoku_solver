@@ -1,101 +1,64 @@
 import time
 import tracemalloc
-import cProfile
-import pstats
-import io
+import copy
+import os
 from Sudoku_solver.Backtracker import backtracker
 from Sudoku_solver.Constraint_hybride import Algm_1
 from Sudoku_solver.My_Algm import my_algm
+from Sudoku_solver.Sudoku_base import SudokuBase
 
-# Multiple Sudoku puzzles for testing
-sample_sudokus = [
-    # Easy puzzle
-    [
-        [5, 3, 0, 0, 7, 0, 0, 0, 0],
-        [6, 0, 0, 1, 9, 5, 0, 0, 0],
-        [0, 9, 8, 0, 0, 0, 0, 6, 0],
-        [8, 0, 0, 0, 6, 0, 0, 0, 3],
-        [4, 0, 0, 8, 0, 3, 0, 0, 1],
-        [7, 0, 0, 0, 2, 0, 0, 0, 6],
-        [0, 6, 0, 0, 0, 0, 2, 8, 0],
-        [0, 0, 0, 4, 1, 9, 0, 0, 5],
-        [0, 0, 0, 0, 8, 0, 0, 7, 9]
-    ],
-    # Medium puzzle
-    [
-        [0, 0, 0, 6, 0, 0, 4, 0, 0],
-        [7, 0, 0, 0, 0, 3, 6, 0, 0],
-        [0, 0, 0, 0, 9, 1, 0, 8, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 5, 0, 1, 8, 0, 0, 0, 3],
-        [0, 0, 0, 3, 0, 6, 0, 4, 5],
-        [0, 4, 0, 2, 0, 0, 0, 6, 0],
-        [9, 0, 3, 0, 0, 0, 0, 0, 0],
-        [0, 2, 0, 0, 0, 0, 1, 0, 0]
-    ],
-    # Hard puzzle
-    [
-        [0, 0, 0, 0, 0, 0, 0, 1, 2],
-        [4, 9, 6, 0, 0, 0, 0, 0, 0],
-        [0, 0, 3, 0, 7, 6, 0, 0, 0],
-        [0, 0, 0, 3, 0, 0, 0, 0, 0],
-        [0, 6, 0, 0, 9, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 1, 0, 3, 0],
-        [0, 0, 0, 4, 1, 0, 0, 0, 0],
-        [0, 0, 8, 0, 0, 0, 2, 0, 0],
-        [3, 0, 0, 0, 0, 0, 0, 0, 0]
-    ]
-]
-
-# Modify the measure_performance function to take multiple boards
-def measure_performance(algorithm_class, algorithm_name, sample_sudokus):
-    for idx, sudoku in enumerate(sample_sudokus):
-        print(f"\nEvaluating {algorithm_name} on Sudoku puzzle {idx + 1}...")
-
-        # Initialize the algorithm with the specific Sudoku board
-        solver = algorithm_class(board=sudoku)
-
-        # Measure time
-        start_time = time.time()
-
-        # Measure memory usage
-        tracemalloc.start()
-        solver.solve()
-        memory_usage = tracemalloc.get_traced_memory()[1]  # Peak memory usage
-        tracemalloc.stop()
-
-        end_time = time.time()
-        time_taken = end_time - start_time
-
-        print(f"Time taken by {algorithm_name}: {time_taken:.4f} seconds")
-        print(f"Memory used by {algorithm_name}: {memory_usage / 1024:.2f} KB")
-
-# Function to profile branches and function calls
-def profile_algorithm(algorithm_class, algorithm_name):
-    print(f"\nProfiling {algorithm_name}...")
+def run_algorithm(algorithm_class):
+    # Start memory tracking
+    tracemalloc.start()
     
-    solver = algorithm_class()
+    # Create a copy of the default board
+    board = copy.deepcopy(SudokuBase.board)
+    solver = algorithm_class(board)
+    
+    # Start timing
+    start_time = time.time()
+    
+    # Solve the puzzle
+    solver.iterations = 0  # Reset iterations for the solver
+    solved = solver.solve()
+    
+    # Stop timing
+    end_time = time.time()
+    
+    # Get current memory usage
+    current, peak = tracemalloc.get_traced_memory()
+    tracemalloc.stop()
+    
+    # Calculate metrics
+    execution_time = end_time - start_time
+    memory_used = peak / 10**6  # Convert to MB
+    
+    return {
+        'Algorithm': solver.__class__.__name__,
+        'Execution Time (s)': execution_time,
+        'Iterations': solver.iterations,
+        'Memory Used (MB)': memory_used,
+        'Solved': solved
+    }
 
-    pr = cProfile.Profile()
-    pr.enable()
+def display_metrics(metrics):
+    print("\nMetrics:")
+    print("+--------------------------------+-----------------------+-------------------+-----------------------+-----------+")
+    print("| Algorithm                      | Execution Time (s)    | Iterations        | Memory Used (MB)      | Solved    |")
+    print("+--------------------------------+-----------------------+-------------------+-----------------------+-----------+")
+    for metric in metrics:
+        print(f"| {metric['Algorithm']:30} | {metric['Execution Time (s)']:21.5f} | {metric['Iterations']:17} | {metric['Memory Used (MB)']:21.5f} | {metric['Solved']}      |")
+        print("+--------------------------------+-----------------------+-------------------+-----------------------+-----------+")
 
-    # Run the algorithm
-    solver.solve()
+def main():
+    algorithms = [backtracker, Algm_1, my_algm]
+    metrics = []
 
-    pr.disable()
-    s = io.StringIO()
-    ps = pstats.Stats(pr, stream=s).sort_stats('cumulative')
-    ps.print_stats()
+    for algorithm in algorithms:
+        metric = run_algorithm(algorithm)
+        metrics.append(metric)
+    os.system('cls' if os.name == 'nt' else 'clear')
+    display_metrics(metrics)
 
-    print(s.getvalue())
-
-# Example comparison
-algorithms = [
-    (backtracker, "Backtracking Algorithm"),
-    (my_algm, "Custom Algorithm"),
-    (Algm_1, "Constraint Hybrid Algorithm")
-]
-
-for alg_class, alg_name in algorithms:
-    measure_performance(alg_class, alg_name, sample_sudokus)
-    profile_algorithm(alg_class, alg_name)
+if __name__ == "__main__":
+    main()

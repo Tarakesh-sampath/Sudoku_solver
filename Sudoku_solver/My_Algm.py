@@ -2,6 +2,9 @@
 from Sudoku_solver.Sudoku_base import SudokuBase
 
 class my_algm(SudokuBase):
+    def __init__(self, board=None):
+        self.board = board if board is not None else None
+        self.iterations = 0  # Initialize iterations counter
     def is_valid(self, num, row, col):
         # Check if 'num' can be placed at board[row][col]
         for i in range(9):
@@ -41,6 +44,7 @@ class my_algm(SudokuBase):
         return self.solve_recursive()
 
     def solve_recursive(self):
+        self.iterations += 1
         # Select the number with the highest frequency
         number_count = [0] * 10
         for row in range(9):
